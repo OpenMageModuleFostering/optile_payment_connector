@@ -1,22 +1,19 @@
 /**
- * This file is part of the Optile Payment Connector extension.
- *
- * Optile Payment Connector is free software: you can redistribute it and/or
- * modify it under the terms of the GNU General Public License as published
- * by the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * Optile Payment Connector is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License along with
- * Optile Payment Connector.  If not, see <http://www.gnu.org/licenses/>.
+ * Copyright optile GmbH 2013
+ * Licensed under the Software License Agreement in effect between optile and
+ * Licensee/user (the "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ * http://www.optile.de/software-license-agreement; in addition, a countersigned
+ * copy has been provided to you for your records. Unless required by applicable
+ * law or agreed to in writing or otherwise stipulated in the License, software
+ * distributed under the License is distributed on an "as is” basis without
+ * warranties or conditions of any kind, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  * @author      i-Ways <dev@i-ways.hr>
- * @copyright   Copyright (c) 2013 Optile. (http://www.optile.de)
- * @license     http://www.gnu.org/licenses/gpl.txt
+ * @copyright   Copyright (c) 2013 optile GmbH. (http://www.optile.de)
+ * @license     http://www.optile.de/software-license-agreement
  */
 
 jQuery.noConflict();

@@ -1,0 +1,23 @@
+<?php $data = $this->getNotification()->getReceivedData() ?>
+
+<div class="content-header">
+    <table cellspacing="0">
+        <tbody><tr>
+            <td style="width:50%;"><h3 class="icon-head head-adminhtml-notification"><?php echo $this->__("IPN details") ?></h3></td>
+            <td class="form-buttons">
+                <button style="" onclick="setLocation('<?php echo Mage::helper('adminhtml')->getUrl('*/*/index') ?>')" class="scalable back" type="button" title="<?php echo $this->__('Back') ?>" id="back"><span><span><span><?php echo $this->__('Back') ?></span></span></span></button>
+            </td>
+        </tr>
+    </tbody></table>
+</div>
+
+<table>
+
+<?php foreach ($data as $k => $v): ?>
+    <tr>
+        <th><?php echo $k ?></th>
+        <td><?php echo $v ?></td>
+    </tr>
+
+<?php endforeach; ?>
+</table>

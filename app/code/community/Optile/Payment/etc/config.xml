@@ -1,61 +1,118 @@
 <?xml version="1.0"?>
 <!--
 /**
- * This file is part of the Optile Payment Connector extension.
- *
- * Optile Payment Connector is free software: you can redistribute it and/or
- * modify it under the terms of the GNU General Public License as published
- * by the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * Optile Payment Connector is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License along with
- * Optile Payment Connector.  If not, see <http://www.gnu.org/licenses/>.
+ * Copyright optile GmbH 2013
+ * Licensed under the Software License Agreement in effect between optile and
+ * Licensee/user (the "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ * http://www.optile.de/software-license-agreement; in addition, a countersigned
+ * copy has been provided to you for your records. Unless required by applicable
+ * law or agreed to in writing or otherwise stipulated in the License, software
+ * distributed under the License is distributed on an "as is" basis without
+ * warranties or conditions of any kind, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  * @author      i-Ways <dev@i-ways.hr>
- * @copyright   Copyright (c) 2013 Optile. (http://www.optile.de)
- * @license     http://www.gnu.org/licenses/gpl.txt
+ * @copyright   Copyright (c) 2013 optile GmbH. (http://www.optile.de)
+ * @license     http://www.optile.de/software-license-agreement
  */
 -->
 <config>
-	<modules>
-		<Optile_Payment>
-			<version>1.0.0</version>
-		</Optile_Payment>
-	</modules>
+    <modules>
+        <Optile_Payment>
+            <version>1.0.3</version>
+        </Optile_Payment>
+    </modules>
 
-	<global>
-		<models>
-			<optile>
-				<class>Optile_Payment_Model</class>
-			</optile>
-		</models>
-		<blocks>
-			<optile>
-				<class>Optile_Payment_Block</class>
-			</optile>
-		</blocks>
-		<helpers>
-			<optile>
-				<class>Optile_Payment_Helper</class>
-			</optile>
-		</helpers>
-	</global>
+    <global>
+        <models>
+            <optile>
+                <class>Optile_Payment_Model</class>
+                <resourceModel>optile_mysql4</resourceModel>
+            </optile>
+            <optile_mysql4>
+                <class>Optile_Payment_Model_Mysql4</class>
+                <entities>
+                    <order>
+                        <table>optile_order</table>
+                    </order>
+                    <quote>
+                        <table>optile_quote</table>
+                    </quote>
+                    <notification>
+                        <table>optile_notification</table>
+                    </notification>
+                </entities>
+            </optile_mysql4>
+        </models>
+        <blocks>
+            <adminhtml>
+                <rewrite>
+                  <sales_order_creditmemo_create_items>Optile_Payment_Block_Adminhtml_Order_Creditmemo_Create_Items</sales_order_creditmemo_create_items>
+                  <sales_order_view>Optile_Payment_Block_Adminhtml_Order_View</sales_order_view>
+                </rewrite>
+            </adminhtml>
+            <optile>
+                <class>Optile_Payment_Block</class>
+            </optile>
+        </blocks>
+        <helpers>
+            <optile>
+                <class>Optile_Payment_Helper</class>
+            </optile>
+        </helpers>
+        <resources>
+            <optile_setup>
+                <setup>
+                    <module>Optile_Payment</module>
+                </setup>
+            </optile_setup>
+        </resources>
+        <template>
+            <email>
+                <sales_email_order_cancel_template translate="label" module="sales">
+                    <label>Order Cancelled</label>
+                    <file>optile/order_cancel.html</file>
+                    <type>html</type>
+                </sales_email_order_cancel_template>
+                <sales_email_order_cancel_guest_template translate="label" module="sales">
+                    <label>Order Cancelled for Guest</label>
+                    <file>optile/order_cancel_guest.html</file>
+                    <type>html</type>
+                </sales_email_order_cancel_guest_template>
+            </email>
+        </template>
+        <events>
+            <sales_order_payment_cancel>
+                <observers>
+                    <optile>
+                        <class>optile/observer</class>
+                        <method>cancelDeferredPayment</method>
+                    </optile>
+                </observers>
+            </sales_order_payment_cancel>
+            <optile_notification_failed>
+                <observers>
+                    <optile>
+                        <class>optile/observer</class>
+                        <method>sendOrderCancelEmail</method>
+                    </optile>
+                </observers>
+            </optile_notification_failed>
+        </events>
+    </global>
 
-	<frontend>
-		<routers>
-			<optile>
-				<use>standard</use>
-				<args>
-					<module>Optile_Payment</module>
-					<frontName>optile</frontName>
-				</args>
-			</optile>
-		</routers>
+    <frontend>
+        <routers>
+            <optile>
+                <use>standard</use>
+                <args>
+                    <module>Optile_Payment</module>
+                    <frontName>optile</frontName>
+                </args>
+            </optile>
+        </routers>
         <layout>
             <updates>
                 <optile>
@@ -63,19 +120,69 @@
                 </optile>
             </updates>
         </layout>
-	</frontend>
+        <events>
+            <sales_quote_payment_save_commit_after>
+                <observers>
+                    <optile>
+                        <class>optile/observer</class>
+                        <method>updateOptileQuote</method>
+                    </optile>
+                </observers>
+            </sales_quote_payment_save_commit_after>
+        </events>
+    </frontend>
 
-	<default>
-		<payment>
-			<optile>
-				<model>optile/paymentMethod</model>
-				<payment_action>authorize</payment_action>				
-				<active>0</active>
-				<merchant_token backend_model="adminhtml/system_config_backend_encrypted" />
-				<title>Optile</title>
-				<test>1</test>
-				<log_enabled>0</log_enabled>
-			</optile>
-		</payment>
-	</default>
+    <adminhtml>
+        <events>
+            <admin_system_config_section_save_after>
+                <observers>
+                    <optile>
+                        <class>optile/observer</class>
+                        <method>disableOtherPaymentMethods</method>
+                    </optile>
+                </observers>
+            </admin_system_config_section_save_after>
+        </events>
+    </adminhtml>
+
+    <admin>
+        <routers>
+            <adminhtml>
+                <args>
+                    <modules>
+                        <Optile_Payment after="Mage_Adminhtml">Optile_Payment_Adminhtml</Optile_Payment>
+                    </modules>
+                </args>
+            </adminhtml>
+        </routers>
+    </admin>
+
+    <default>
+        <payment>
+            <optile>
+                <model>optile/paymentMethod</model>
+                <payment_action>authorize</payment_action>
+                <active>0</active>
+                <merchant_token backend_model="adminhtml/system_config_backend_encrypted" />
+                <title>optile</title>
+                <api_url>https://api.sandbox.oscato.com</api_url>
+                <remote_ip>213.95.26.76</remote_ip>
+                <quote_prefix></quote_prefix>
+                <log_enabled>0</log_enabled>
+                <log_level>3</log_level>
+                <disable_methods>0</disable_methods>
+                <preselection_deferral>NON_DEFERRED</preselection_deferral>
+                <refund_enabled>1</refund_enabled>
+            </optile>
+        </payment>
+        <sales_email>
+            <order_cancel>
+                <enabled>1</enabled>
+                <template>sales_email_order_cancel_template</template>
+                <guest_template>sales_email_order_cancel_guest_template</guest_template>
+                <identity>sales</identity>
+                <copy_method>bcc</copy_method>
+            </order_cancel>
+        </sales_email>
+    </default>
 </config>

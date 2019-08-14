@@ -1,27 +1,25 @@
 /**
- * This file is part of the Optile Payment Connector extension.
- *
- * Optile Payment Connector is free software: you can redistribute it and/or
- * modify it under the terms of the GNU General Public License as published
- * by the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * Optile Payment Connector is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License along with
- * Optile Payment Connector.  If not, see <http://www.gnu.org/licenses/>.
+ * Copyright optile GmbH 2013
+ * Licensed under the Software License Agreement in effect between optile and
+ * Licensee/user (the "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ * http://www.optile.de/software-license-agreement; in addition, a countersigned
+ * copy has been provided to you for your records. Unless required by applicable
+ * law or agreed to in writing or otherwise stipulated in the License, software
+ * distributed under the License is distributed on an "as is" basis without
+ * warranties or conditions of any kind, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  * @author      i-Ways <dev@i-ways.hr>
- * @copyright   Copyright (c) 2013 Optile. (http://www.optile.de)
- * @license     http://www.gnu.org/licenses/gpl.txt
+ * @copyright   Copyright (c) 2013 optile GmbH. (http://www.optile.de)
+ * @license     http://www.optile.de/software-license-agreement
  */
-
-function ValidationForm(formId, validationUrl) {
+function OptilePaymentNetworkForm(formId, validationUrl, operationUrl, networkCode) {
 	this.formId = formId;
 	this.validationUrl = validationUrl;
+	this.operationUrl = operationUrl;
+	this.networkCode = networkCode;
 	this.widget = null;
 	this.holderName = null;
 	this.holderNameMessage = null;
@@ -53,7 +51,7 @@ function ValidationForm(formId, validationUrl) {
 	this.passwordMessage = null;
 }
 
-ValidationForm.prototype.Build = function(parentWidget) {
+OptilePaymentNetworkForm.prototype.Build = function(parentWidget) {
 	this.holderName = parentWidget.find("#" + this.formId + "-holderName").first();
 	this.holderNameMessage = parentWidget.find("#" + this.formId + "-holderName-message").first();
 	this.number = parentWidget.find("#" + this.formId + "-number").first();
@@ -84,7 +82,7 @@ ValidationForm.prototype.Build = function(parentWidget) {
 	this.passwordMessage = parentWidget.find("#" + this.formId + "-password-message").first();
 };
 
-ValidationForm.prototype.ToJSON = function() {
+OptilePaymentNetworkForm.prototype.ToJSON = function() {
 	var data = {};
 	if(this.holderName.length > 0) data.holderName = this.holderName.val();
 	if(this.number.length > 0) data.number = this.number.val();
@@ -99,45 +97,74 @@ ValidationForm.prototype.ToJSON = function() {
 	if(this.country.length > 0) data.country = this.country.val();
 	if(this.city.length > 0) data.city = this.city.val();
 	if(this.login.length > 0) data.login = this.login.val();
-	if(this.password.length > 0) data.password = this.password.val();	
+	if(this.password.length > 0) data.password = this.password.val();
 
 	return data;
 };
 
-ValidationForm.prototype.BindMessages = function(messages) {
-	for(item in messages) {
-		if(messages[item] === null) continue;
-				
+OptilePaymentNetworkForm.prototype.BindValues = function(data) {
+	for(item in data) {
 		if(this.hasOwnProperty(item) && this.hasOwnProperty(item + "Message")) {
-			var widget = this[item + "Message"];
-			
-			widget.removeClass('optile-error-msg');
-			
-			switch(messages[item].type) {
-			case 'ERROR':
-				widget.addClass('optile-error-msg');
-				break;
+			var itemWidget = this[item];
+
+			if(data[item] !== null) {
+				itemWidget.val(data[item]);
 			}
-			
-			widget.html(messages[item].message);
 		}
 	}
 };
 
-function ValidationController(widget, forms, submit) {
+OptilePaymentNetworkForm.prototype.BindMessages = function(messages) {
+	for(item in messages) {
+		if(this.hasOwnProperty(item) && this.hasOwnProperty(item + "Message")) {
+			var messageWidget = this[item + "Message"];
+			var itemWidget = this[item];
+
+			// reset message
+			messageWidget.html("");
+			messageWidget.removeClass('optile-error-msg');
+			messageWidget.removeClass('optile-info-msg');
+			itemWidget.removeClass('input-text validation-passed');
+			itemWidget.removeClass('input-text validation-failed');
+
+			if(messages[item] !== null) {
+				switch(messages[item].type) {
+				case 'ERROR':
+					messageWidget.addClass('optile-error-msg');
+					if(!itemWidget.is('select')) {
+						itemWidget.addClass('input-text');
+					}
+					itemWidget.addClass('validation-failed');
+					break;
+				case 'INFO':
+					messageWidget.addClass('optile-info-msg');
+					itemWidget.addClass('input-text validation-passed');
+					break;
+				}
+
+				messageWidget.html(messages[item].message);
+			}
+		}
+	}
+};
+
+// alias new OptilePaymentNetworkForm to old ValidationForm
+function ValidationForm() {
+	OptilePaymentNetworkForm.apply(this, arguments);
+}
+ValidationForm.prototype = new OptilePaymentNetworkForm();
+
+function ValidationController(widget, forms, submit, selectedNetworkSelector) {
 	this.widget = widget;
 	this.forms = forms;
 	this.submit = submit;
+	this.selectedNetworkSelector = selectedNetworkSelector;
 }
 
 ValidationController.prototype.Init = function() {
 	var self = this;
 	this.forms.forEach(function(item) {
 		item.Build(self.widget);
-	});
-	this.submit.click(function(event) {
-		event.preventDefault();
-		self.Validate(event);
 	});
 };
 
@@ -148,29 +175,24 @@ ValidationController.prototype.FindFormByFormId = function(formId) {
 			result = this.forms[i];
 		}
 	}
-	
+
 	return result;
 };
 
 ValidationController.prototype.Validate = function(event) {
 	var self = this;
-	var network = this.widget.find("input[name=\"optile-selected-network\"]:checked").val();
+	var network = this.widget.find(this.selectedNetworkSelector).val();
 	var form = this.FindFormByFormId(network);
 	var data = form.ToJSON();
 	var url = form.validationUrl;
-	
+
 	jQuery.post(url, data, function(resultData, resultStatus, xhr) {
 		self.ValidationResult.call(self, resultData, resultStatus, xhr);
 	}, "json");
 };
 
 ValidationController.prototype.ValidationResult = function(resultData, resultStatus, xhr) {
-	var network = this.widget.find("input[name=\"optile-selected-network\"]:checked").val();
+	var network = this.widget.find(this.selectedNetworkSelector).val();
 	var form = this.FindFormByFormId(network);
 	form.BindMessages(resultData.messages);
-	
-	if(resultData.valid === true) {
-		this.submit.off("click");
-		this.submit.click();
-	}
 };

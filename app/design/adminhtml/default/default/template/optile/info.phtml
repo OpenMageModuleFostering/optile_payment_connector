@@ -1,0 +1,38 @@
+<?php
+/**
+ * Copyright optile GmbH 2013
+ * Licensed under the Software License Agreement in effect between optile and
+ * Licensee/user (the "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ * http://www.optile.de/software-license-agreement; in addition, a countersigned
+ * copy has been provided to you for your records. Unless required by applicable
+ * law or agreed to in writing or otherwise stipulated in the License, software
+ * distributed under the License is distributed on an "as is” basis without
+ * warranties or conditions of any kind, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ *
+ * @author      i-Ways <dev@i-ways.hr>
+ * @copyright   Copyright (c) 2013 optile GmbH. (http://www.optile.de)
+ * @license     http://www.optile.de/software-license-agreement
+ */
+
+/**
+ * @var $this Optile_Payment_Block_Info
+ */
+?>
+<?php echo $this->htmlEscape($this->getMethod()->getTitle()) ?>
+
+<?php if ($_specificInfo = $this->getSpecificInformation()):?>
+<table>
+<?php foreach ($_specificInfo as $_label => $_value):?>
+    <?php if (empty($_value)) continue; ?>
+    <tr>
+        <td><?php echo $this->escapeHtml($_label)?>:</td>
+        <td><?php echo nl2br(implode($this->getValueAsArray($_value, true), "\n"))?></td>
+    </tr>
+<?php endforeach; ?>
+</table>
+<?php endif;?>
+
+<?php echo $this->getChildHtml()?>

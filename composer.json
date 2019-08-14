@@ -1,13 +1,13 @@
 {
     "name": "OpenMageModuleFostering/Optile_Payment_Connector",
     "type": "magento-module",
-    "license": "GPL",
+    "license": "GNU-General-Public-License",
     "homepage": "",
-    "description": "Add the Optile Payment Gateway as a payment method to your Magento store.",
+    "description": "Adds the Optile Payment Gateway as a payment method to your Magento store.",
     "authors": [
     {
-        "name": "Optile",
-        "email": "tomislav.santek@optile.de"
+        "name": "i-Ways",
+        "email": "extensions@i-ways.hr"
     }
 ],
     "suggest": {

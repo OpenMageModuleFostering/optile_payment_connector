@@ -1,23 +1,20 @@
 <?php
 /**
- * This file is part of the Optile Payment Connector extension.
- *
- * Optile Payment Connector is free software: you can redistribute it and/or
- * modify it under the terms of the GNU General Public License as published
- * by the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * Optile Payment Connector is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License along with
- * Optile Payment Connector.  If not, see <http://www.gnu.org/licenses/>.
+ * Copyright optile GmbH 2013
+ * Licensed under the Software License Agreement in effect between optile and
+ * Licensee/user (the "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ * http://www.optile.de/software-license-agreement; in addition, a countersigned
+ * copy has been provided to you for your records. Unless required by applicable
+ * law or agreed to in writing or otherwise stipulated in the License, software
+ * distributed under the License is distributed on an "as is” basis without
+ * warranties or conditions of any kind, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  * @author      i-Ways <dev@i-ways.hr>
- * @copyright   Copyright (c) 2013 Optile. (http://www.optile.de)
- * @license     http://www.gnu.org/licenses/gpl.txt
+ * @copyright   Copyright (c) 2013 optile GmbH. (http://www.optile.de)
+ * @license     http://www.optile.de/software-license-agreement
  */
 
 /**
@@ -25,17 +22,13 @@
  *
  */
 class Optile_Payment_Block_List extends Mage_Payment_Block_Form {
-	
+
 	/**
 	 * payment method code
 	 */
 	protected $_methodCode = 'optile';
-	
-	/**
-	 * Logging filename
-	 */
-	protected $_logFileName = 'optile.log';
-	
+    protected $_listResponse = null;
+
 	/**
 	 * Block constructor
 	 */
@@ -43,24 +36,25 @@ class Optile_Payment_Block_List extends Mage_Payment_Block_Form {
 		$this->setTemplate ( 'optile/list.phtml' );
 		parent::__construct ();
 	}
-	
-	/**
-	 * Returns whether logging is enabled
-	 */
-	private function isLogEnabled() {
-		return Mage::getStoreConfig ( 'payment/optile/log_enabled', Mage::app ()->getStore () );
-	}
-	
-	/**
-	 * Logging helper
-	 * @param unknown $what thing to log
-	 * @param string $level log level
-	 */
-	public function log($what, $level = null) {
-		if ($this->isLogEnabled ())
-			Mage::log ( $what, $level, $file = $this->_logFileName, true );
-	}
-	
+    
+    public function _toHtml() {
+        Mage::helper('optile')->log("Doing _toHTML method");
+        // check if there is sufficient data to execute List request
+
+        try{
+            $response = $this->getListResponse();
+
+            if($response->getInteraction()->getCode() != "PROCEED"){
+                $this->setTemplate ( 'optile/list_error.phtml' );
+            }
+        }catch (Exception $e){
+            Mage::helper("optile")->log("Exception during LIST:");
+            Mage::helper("optile")->log($e->getMessage());
+            $this->setTemplate ( 'optile/list_error.phtml' );
+        }
+        return parent::_toHtml();
+    }
+
 	/**
 	 * Adds optilevalidation.js into <script> when block is shown
 	 */
@@ -69,31 +63,36 @@ class Optile_Payment_Block_List extends Mage_Payment_Block_Form {
 // 			$this->getLayout ()->getBlock ( 'head' )->addJs ( 'optile/optilevalidation.js' );
 // 			$this->getLayout ()->getBlock ( 'head' )->addJs ( 'optile/checkout.js' );
 		}
-		
+
 		return parent::_prepareLayout ();
 	}
 
+    public function getListResponse(){
+        if($this->_listResponse === null){
+            $this->_listResponse = $this->_getListResponse();
+        }
+
+        return $this->_listResponse;
+    }
+
 	/**
 	 * Returns available networks to render in html
-	 * 
+	 *
 	 * ----
 	 * If optile charge request responds with RETRY/TRY_OTHER_ACCOUNT/TRY_OTHER_NETWORK,
 	 * existing list request will be refreshed through listRequestSelfLink sent
 	 * by AJAX in checkout.js
 	 */
-	public function getListResponse() {
-		$listRequestSelfLink = Mage::app ()->getRequest ()->getParam ( 'listRequestSelfLink', null );
-		
-		$quote = Mage::getSingleton ( 'checkout/type_onepage' )->getQuote ();
-		$optile = Mage::getModel ( 'optile/checkout', array (
-				'quote' => $quote,
-				'listRequestSelfLink' => $listRequestSelfLink 
-		) );
-		$response = $optile->requestAvailableNetworks ();
-		
+	public function _getListResponse() {
+        
+		$listRequestSelfLink = Mage::app()->getRequest()->getParam('listRequestSelfLink');
+
+		$optile = Mage::getModel('optile/checkout');
+		$response = $optile->requestAvailableNetworks($listRequestSelfLink);
+
 		return $response;
 	}
-	
+
 	/**
 	 * Prepares optile payment network form, replaces ${formId} with our form id
 	 * @param unknown $form
@@ -101,19 +100,29 @@ class Optile_Payment_Block_List extends Mage_Payment_Block_Form {
 	 * @return mixed
 	 */
 	public function renderFormHtml($form, $form_id) {
-		return str_replace ( '${formId}', $form_id, $form );
+
+		return str_replace (
+                array(
+                    'function ${formId}_WhatIsPayPal()', //T: temporary fix to avoid AJAX issues with Prototype
+                    '${formId}',
+                    ),
+                array(
+                    '${formId}_WhatIsPayPal = function()', //T: temporary fix to avoid AJAX issues with Prototype
+                    $form_id,
+                    ),
+                $form );
 	}
 
 	/**
 	 * Returns form id for network code
-	 * 
+	 *
 	 * E.g. if networkcode is 'VISA', return 'optile-VISA'
-	 * 
+	 *
 	 * @param unknown $networkCode
 	 * @return string
 	 */
 	public function getFormId($networkCode) {
-		return $this->getMethodCode () . '-' . $networkCode;
+		return $this->getMethodCode () . '_' . $networkCode;
 	}
 
 }

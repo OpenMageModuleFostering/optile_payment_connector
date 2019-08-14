@@ -1,122 +1,331 @@
 <?xml version="1.0"?>
 <!--
 /**
- * This file is part of the Optile Payment Connector extension.
- *
- * Optile Payment Connector is free software: you can redistribute it and/or
- * modify it under the terms of the GNU General Public License as published
- * by the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * Optile Payment Connector is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License along with
- * Optile Payment Connector.  If not, see <http://www.gnu.org/licenses/>.
+ * Copyright optile GmbH 2013
+ * Licensed under the Software License Agreement in effect between optile and
+ * Licensee/user (the "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ * http://www.optile.de/software-license-agreement; in addition, a countersigned
+ * copy has been provided to you for your records. Unless required by applicable
+ * law or agreed to in writing or otherwise stipulated in the License, software
+ * distributed under the License is distributed on an "as is" basis without
+ * warranties or conditions of any kind, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  * @author      i-Ways <dev@i-ways.hr>
- * @copyright   Copyright (c) 2013 Optile. (http://www.optile.de)
- * @license     http://www.gnu.org/licenses/gpl.txt
+ * @copyright   Copyright (c) 2013 optile GmbH. (http://www.optile.de)
+ * @license     http://www.optile.de/software-license-agreement
  */
 -->
 <config>
-	<sections>
-		<payment>
-			<groups>
-				<optile translate="label" module="optile">
-					<label>Optile</label>
-					<sort_order>10</sort_order>
-					<show_in_default>1</show_in_default>
-					<show_in_website>1</show_in_website>
-					<show_in_store>0</show_in_store>
-					<fields>
-						<active translate="label">
-							<label>Enabled</label>
-							<frontend_type>select</frontend_type>
-							<source_model>adminhtml/system_config_source_yesno</source_model>
-							<sort_order>1</sort_order>
-							<show_in_default>1</show_in_default>
-							<show_in_website>1</show_in_website>
-							<show_in_store>0</show_in_store>
-						</active>
-						<title translate="label">
-							<label>Title</label>
-							<frontend_type>text</frontend_type>
-							<sort_order>2</sort_order>
-							<show_in_default>1</show_in_default>
-							<show_in_website>1</show_in_website>
-							<show_in_store>0</show_in_store>
-						</title>
-						<merchant_code translate="label">
-							<label>Merchant Code</label>
-							<frontend_type>text</frontend_type>
-							<sort_order>15</sort_order>
-							<show_in_default>1</show_in_default>
-							<show_in_website>1</show_in_website>
-							<show_in_store>0</show_in_store>
-						</merchant_code>
-						<merchant_token translate="label">
-							<label>Merchant Token</label>
-							<frontend_type>obscure</frontend_type>
-							<backend_model>adminhtml/system_config_backend_encrypted
-							</backend_model>
-							<sort_order>20</sort_order>
-							<show_in_default>1</show_in_default>
-							<show_in_website>1</show_in_website>
-							<show_in_store>0</show_in_store>
-						</merchant_token>
-						<test translate="label">
-							<label>Test Mode</label>
-							<frontend_type>select</frontend_type>
-							<source_model>adminhtml/system_config_source_yesno</source_model>
-							<sort_order>80</sort_order>
-							<show_in_default>1</show_in_default>
-							<show_in_website>1</show_in_website>
-							<show_in_store>0</show_in_store>
-						</test>
-						<log_enabled translate="label">
-							<label>Logging enabled?</label>
-							<frontend_type>select</frontend_type>
-							<source_model>adminhtml/system_config_source_yesno</source_model>
-							<sort_order>80</sort_order>
-							<show_in_default>1</show_in_default>
-							<show_in_website>1</show_in_website>
-							<show_in_store>0</show_in_store>
-						</log_enabled>						
-						<allowspecific translate="label">
-							<label>Payment from Applicable Countries</label>
-							<frontend_type>allowspecific</frontend_type>
-							<sort_order>160</sort_order>
-							<source_model>adminhtml/system_config_source_payment_allspecificcountries
-							</source_model>
-							<show_in_default>1</show_in_default>
-							<show_in_website>1</show_in_website>
-							<show_in_store>0</show_in_store>
-						</allowspecific>
-						<specificcountry translate="label">
-							<label>Payment from Specific Countries</label>
-							<frontend_type>multiselect</frontend_type>
-							<sort_order>170</sort_order>
-							<source_model>adminhtml/system_config_source_country
-							</source_model>
-							<show_in_default>1</show_in_default>
-							<show_in_website>1</show_in_website>
-							<show_in_store>0</show_in_store>
-						</specificcountry>
-						<sort_order translate="label">
-							<label>Sort Order</label>
-							<frontend_type>text</frontend_type>
-							<sort_order>200</sort_order>
-							<show_in_default>1</show_in_default>
-							<show_in_website>1</show_in_website>
-							<show_in_store>0</show_in_store>
-							<frontend_class>validate-number</frontend_class>
-						</sort_order>
-					</fields>
-				</optile>
-			</groups>
-		</payment>
-	</sections>
+    <sections>
+        <payment>
+            <groups>
+                <optile translate="label" module="optile">
+                    <label>optile</label>
+                    <sort_order>10</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <expanded>1</expanded>
+                    <comment><![CDATA[
+<table style="width: 100%">
+    <tr>
+        <td style="width: 50%"><strong>Links:</strong></td>
+        <td style="width: 50%"><strong>Contact:</strong></td>
+    </tr>
+    <tr>
+        <td><a href="https://www.optile.net" target="_blank">About optile</a></td>
+        <td><a href="https://optile.zendesk.com/">Support Center</a></td>
+    </tr>
+    <tr>
+        <td><a href="https://www.optile.io/de/optile-magento-plug-in-doc" target="_blank">Magento Plugin Documentation</a></td>
+        <td>&nbsp;</td>
+    </tr>
+    <tr>
+        <td><a href="https://portal.optile.net/" target="_blank">optile Dashboard for Configuration and Transaction Monitoring</a></td>
+        <td>&nbsp;</td>
+    </tr>
+</table>
+<br/>
+                    ]]></comment>
+                    <fields>
+                        <active translate="label">
+                            <label>Enabled</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>1</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </active>
+                        <title translate="label">
+                            <label>Title</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>2</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </title>
+                        <merchant_code translate="label">
+                            <label>Merchant Code</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </merchant_code>
+                        <merchant_token translate="label">
+                            <label>Merchant Token</label>
+                            <frontend_type>obscure</frontend_type>
+                            <backend_model>adminhtml/system_config_backend_encrypted
+                            </backend_model>
+                            <sort_order>20</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </merchant_token>
+                        <api_url translate="label">
+                            <label>optile API URL</label>
+                            <frontend_type>text</frontend_type>
+                            <comment></comment>
+                            <sort_order>30</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </api_url>
+                        <remote_ip translate="label">
+                            <label>optile Notification IP</label>
+                            <frontend_type>text</frontend_type>
+                            <comment>optile IP that sends payment notifications. Notifications will be accepted only from this IP address.</comment>
+                            <sort_order>40</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </remote_ip>
+                        <quote_prefix translate="label">
+                            <label>Transaction ID prefix</label>
+                            <frontend_type>text</frontend_type>
+                            <comment>Prefix that will be used for all transactions</comment>
+                            <sort_order>40</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </quote_prefix>
+                        <proxy_ip translate="label">
+                            <label>Proxy / Load balancer IP address</label>
+                            <comment>If your server is behind a load balancer or proxy, fill in its IP address here. This should be a trusted IP that belongs to you.</comment>
+                            <sort_order>50</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </proxy_ip>
+                        <log_enabled translate="label">
+                            <label>Logging enabled?</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>60</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </log_enabled>
+                        <log_level translate="label">
+                            <label>Logging level</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>optile/system_config_source_loglevel</source_model>
+                            <sort_order>65</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <comment><![CDATA[Determines the minimum log level that will be written to log files.]]></comment>
+                        </log_level>
+                        <allowspecific translate="label">
+                            <label>Payment from Applicable Countries</label>
+                            <frontend_type>allowspecific</frontend_type>
+                            <sort_order>160</sort_order>
+                            <source_model>adminhtml/system_config_source_payment_allspecificcountries
+                            </source_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </allowspecific>
+                        <specificcountry translate="label">
+                            <label>Payment from Specific Countries</label>
+                            <frontend_type>multiselect</frontend_type>
+                            <sort_order>170</sort_order>
+                            <source_model>adminhtml/system_config_source_country
+                            </source_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </specificcountry>
+                        <instructions>
+                            <label>Payment instructions</label>
+                            <frontend_model>optile/adminhtml_system_config_frontend_instructions</frontend_model>
+                            <backend_model>optile/system_config_backend_instructions</backend_model>
+                            <sort_order>180</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <comment>Payment instructions per payment method.</comment>
+                        </instructions>
+                        <sort_order translate="label">
+                            <label>Sort Order</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>200</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <frontend_class>validate-number</frontend_class>
+                        </sort_order>
+                        <preselection_deferral translate="label">
+                            <label>Deferred mode:</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>optile/system_config_source_deferral</source_model>
+                            <sort_order>210</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <comment><![CDATA[
+<b>Deferred</b>: Only networks which support deferred payments are listed. They are in deferred mode for subsequent charges<br/>
+<b>NON_DEFERRED</b> (default): All networks which support immediate payment collection are listed. They are in non-deferred mode when a charge request hits them.<br/>
+<b>ANY</b>: All networks are returned. If they support both modes, they are returned in deferred mode.
+                            ]]></comment>
+                        </preselection_deferral>
+                        <refund_enabled translate="label">
+                            <label>Refunds enabled?</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>220</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </refund_enabled>
+                        <active_methods_found>
+                            <label>Active methods found</label>
+                            <frontend_type>hidden</frontend_type>
+                            <backend_model>optile/system_config_backend_enabledmethods_bool</backend_model>
+                            <sort_order>900</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <!-- hide this field -->
+                            <depends>
+                                <non_existent>1</non_existent>
+                            </depends>
+                        </active_methods_found>
+                        <no_active_methods_found>
+                            <label><![CDATA[<span style="color:green">All other payment methods are disabled</span>]]></label>
+                            <frontend_type>hidden</frontend_type>
+                            <frontend_model>optile/adminhtml_system_config_frontend_noactivemethods</frontend_model>
+                            <sort_order>905</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <depends>
+                                <active_methods_found>0</active_methods_found>
+                            </depends>
+                        </no_active_methods_found>
+                        <disable_methods translate="label">
+                            <label>Disable other payment methods</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <backend_model>optile/system_config_backend_disablemethods</backend_model>
+                            <comment><![CDATA[<span style="color:red">Other methods are still enabled</span>]]></comment>
+                            <sort_order>910</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <depends>
+                                <active_methods_found>1</active_methods_found>
+                            </depends>
+                        </disable_methods>
+                        <methods_to_disable>
+                            <label>Payment methods to disable</label>
+                            <frontend_type>multiselect</frontend_type>
+                            <source_model>optile/system_config_source_enabledmethods</source_model>
+                            <backend_model>optile/system_config_backend_enabledmethods_select</backend_model>
+                            <can_be_empty>0</can_be_empty>
+                            <sort_order>920</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <depends>
+                                <disable_methods>1</disable_methods>
+                            </depends>
+                        </methods_to_disable>
+                    </fields>
+                </optile>
+            </groups>
+        </payment>
+        <sales_email>
+            <groups>
+                <order_cancel translate="label">
+                    <label>Order Cancellation</label>
+                    <frontend_type>text</frontend_type>
+                    <sort_order>11</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <fields>
+                        <enabled translate="label">
+                            <label>Enabled</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>0</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </enabled>
+                        <identity translate="label">
+                            <label>Order Cancellation Email Sender</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_email_identity</source_model>
+                            <sort_order>1</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </identity>
+                        <template translate="label">
+                            <label>Order Cancellation Template</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_email_template</source_model>
+                            <sort_order>2</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </template>
+                        <guest_template translate="label">
+                            <label>Order Cancellation Template for Guest</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_email_template</source_model>
+                            <sort_order>3</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </guest_template>
+                        <copy_to translate="label comment">
+                            <label>Send Cancellation Email Copy To</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>4</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <comment>Comma-separated.</comment>
+                        </copy_to>
+                        <copy_method translate="label">
+                            <label>Send Cancellation Email Copy Method</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_email_method</source_model>
+                            <sort_order>5</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </copy_method>
+                    </fields>
+                </order_cancel>
+            </groups>
+        </sales_email>
+    </sections>
 </config>

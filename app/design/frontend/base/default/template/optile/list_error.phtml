@@ -1,0 +1,17 @@
+<script type="text/javascript">
+    jQuery("#p_method_optile").parent().hide();
+
+    //TODO: refactor this
+    if( typeof(window.optileListLoadCounter) == "undefined"){
+        window.optileListLoadCounter = 1;
+    }
+    window.optileListLoadCounter++;
+
+    // OneStep checkout and design specific:
+    if(window.optileListLoadCounter > 1){
+        jQuery('.checkout-onepage-index #p_method_optile').parent().hide();
+        restylePaymentCheck();
+        restyleSelect();
+    }
+</script>
+<p><?php echo $this->__("Unable to display available payment networks, please check if you entered all required fields and try again"); ?></p>

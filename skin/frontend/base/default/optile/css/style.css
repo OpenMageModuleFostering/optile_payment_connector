@@ -1,0 +1,132 @@
+/**
+ * Copyright optile GmbH 2013
+ * Licensed under the Software License Agreement in effect between optile and
+ * Licensee/user (the "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ * http://www.optile.de/software-license-agreement; in addition, a countersigned
+ * copy has been provided to you for your records. Unless required by applicable
+ * law or agreed to in writing or otherwise stipulated in the License, software
+ * distributed under the License is distributed on an "as is” basis without
+ * warranties or conditions of any kind, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ *
+ * @author      i-Ways <dev@i-ways.hr>
+ * @copyright   Copyright (c) 2013 optile GmbH. (http://www.optile.de)
+ * @license     http://www.optile.de/software-license-agreement
+ */
+/* Margins for payment form rows */
+#payment_form_optile .row {
+        position: relative;
+        margin: 10px 35px;
+}
+
+#payment_form_optile .row:before,
+#payment_form_optile .row:after {
+    content: " "; /* 1 */
+    display: table; /* 2 */
+}
+#payment_form_optile .row:after {
+    clear: both;
+}
+#payment_form_optile .row .col {
+    float: left;
+    width: 30%;
+}
+#payment_form_optile .row .col1 {
+    float: left;
+    width: 25%;
+}
+#payment_form_optile .row .col3 {
+    float: left;
+    width: 35%;
+    margin-left: 10px;
+}
+#payment_form_optile .verificationCode {
+    width: 50px;
+}
+#payment_form_optile .row3 .col2 {
+    position: relative;
+}
+#payment_form_optile .row3 .col2 .after {
+    cursor: pointer;
+    background-color: #dbdbdb;
+    border: 1px solid #3d3d3d;
+    border-radius: 30px 30px 30px 30px;
+    color: #3d3d3d;
+    display: block;
+    font-size: 14px;
+    font-weight: bold;
+    height: 15px;
+    left: 60px;
+    line-height: 1;
+    padding: 2px;
+    position: absolute;
+    text-align: center;
+    top: 6px;
+    width: 15px;
+}
+#payment_form_optile .hint {
+    display: none;
+    background-color: #ffffff;
+    border: 1px solid #cccccc;
+    position: absolute;
+    -webkit-border-radius: 5px;
+    border-radius: 5px;
+    padding: 10px;
+    top: 31px;
+    left: 30%;
+    z-index: 10;
+}
+#payment_form_optile .hint:before {
+    content: "";
+    height: 0;
+    position: absolute;
+    width: 0;
+    border-style: solid;
+    border-width: 10px;
+    border-color: transparent transparent #dbdbdb transparent;
+    top: -20px;
+    left: 50px;
+}
+#payment_form_optile .hint:after {
+    content: "";
+    height: 0;
+    position: absolute;
+    width: 0;
+    border-style: solid;
+    border-width: 10px;
+    border-color: transparent transparent #ffffff transparent;
+    top: -18px;
+    left: 50px;
+}
+.optile-error-msg { color: red; display: block;}
+.optile-info-msg { display: none; }
+
+/* spacing around optile payment method radio buttons */
+input[id*='optile-selected-network-'] {
+	margin: 10px 10px 10px 0px;
+}
+
+
+/* Vertical spacing between payment methods */
+#payment_form_optile li {
+	margin: 0 0 10px 0;
+}
+
+/* horizontal spacing between selects */
+#payment_form_optile .select {
+	margin: 0 10px 0 0;
+  width: auto;
+}
+
+
+/* spacing around Magento payment method's radio buttons */
+input[id*='p_method_'] {
+	margin: 10px 10px 10px 0px;
+}
+
+/* bottom margin of the whole Magento payment section */
+dl#checkout-payment-method-load {
+	margin: 0 0 15px 0;
+}

@@ -1,82 +1,122 @@
 <?php
 /**
- * This file is part of the Optile Payment Connector extension.
- *
- * Optile Payment Connector is free software: you can redistribute it and/or
- * modify it under the terms of the GNU General Public License as published
- * by the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * Optile Payment Connector is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License along with
- * Optile Payment Connector.  If not, see <http://www.gnu.org/licenses/>.
+ * Copyright optile GmbH 2013
+ * Licensed under the Software License Agreement in effect between optile and
+ * Licensee/user (the "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ * http://www.optile.de/software-license-agreement; in addition, a countersigned
+ * copy has been provided to you for your records. Unless required by applicable
+ * law or agreed to in writing or otherwise stipulated in the License, software
+ * distributed under the License is distributed on an "as is” basis without
+ * warranties or conditions of any kind, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  * @author      i-Ways <dev@i-ways.hr>
- * @copyright   Copyright (c) 2013 Optile. (http://www.optile.de)
- * @license     http://www.gnu.org/licenses/gpl.txt
+ * @copyright   Copyright (c) 2013 optile GmbH. (http://www.optile.de)
+ * @license     http://www.optile.de/software-license-agreement
  */
-
 /* @var $this Optile_Payment_Block_List */
 ?>
 <?php $response = $this->getListResponse() ?>
 <?php $networkGroups = $response->getNetworks() ?>
 <script type="text/javascript">
 //<![CDATA[
-    var self = this;
-    var controller;
+  var self = this;
+  var controller;
+  var terms_and_conditions_error_text = "<?php echo $this->__("Please agree to all the terms and conditions before placing the order."); ?>";
 
-    jQuery(function() {
-		var forms = Array();
-		<?php foreach($networkGroups as $networkGroupCode => $networks): ?>
-			<?php foreach($networks as $network): ?>
-		forms.push(new ValidationForm('<?php echo $this->getFormId($network->getCode()) ?>', '<?php echo $network->getLinks()->getValidationLink() ?>'));
-			<?php endforeach ?>
-		<?php endforeach ?>
-		
-		self.controller = new ValidationController(
-				jQuery('#payment_form_optile'), 
-				forms, 
- 				jQuery('#payment-buttons-container > button')
-				);
-		self.controller.Init();
-	});
-
-//]]>
-</script>
-<style>
-.optile-error-msg { color: red; }
-</style>
-
-<div id="payment_form_optile" style="display:none;">
-<input type="hidden" name="optile-list-self" id="optile-list-self" value="<?php $links = $response->getLinks(); echo $links['self']; ?>">
-<?php $first = true ?>
-<ul style="padding-left: 20px">
-<?php foreach($networkGroups as $networkGroupCode => $networks): ?>
-<div id="optile-group-<?php echo $networkGroupCode ?>">
-	<?php foreach($networks as $network): ?>
-	<li>
-	<input type="hidden" id="optile-<?php echo $network->getCode() ?>-operation" name="operation" value="<?php echo $network->getLinks()->getOperation() ?>">
-	<input type="radio" name="optile-selected-network" onclick="optileForm.switchMethod('optile-<?php echo $network->getCode() ?>')" value="optile-<?php echo $network->getCode() ?>" <?php if($first): echo "checked"; $first = false; endif ?>>
-	<img src="<?php echo $network->getLinks()->getLogoLink() ?>" />	
-	<div id="optile-<?php echo $network->getCode() ?>-network" style="display:none;">
-		<?php echo $this->renderFormHtml($network->getLinks()->getLocalizedFormHtml(), $this->getFormId($network->getCode())) ?>
-	</div>
-	</li>
-	<?php endforeach ?>
-</div>
+  jQuery(function() {
+    console.log("List request executed");
+    window.cartPageUrl = '<?php echo $this->getUrl('checkout/cart') ?>'; //T: Moved here because of Magento 1.8 update - loads this block only on AJAX call
+    var forms = Array();
+<?php foreach ($networkGroups as $networkGroupCode => $networks): ?>
+  <?php foreach ($networks as $network): ?>
+        forms.push(new ValidationForm('<?php echo $this->getFormId($network->getCode()) ?>', '<?php echo $network->getLinks()->getValidationLink() ?>', '<?php echo $network->getLinks()->getOperation() ?>', '<?php echo $network->getCode() ?>'));
+  <?php endforeach ?>
 <?php endforeach ?>
-</ul>
-</div>
 
-<script type="text/javascript">
-//<![CDATA[
-           jQuery(function() {
-			window.optileForm = new OptileForm('co-payment-form');    
-			optileForm.init();
-           });
+    if (typeof (window.optileListLoadCounter) == "undefined") {
+      window.optileListLoadCounter = 0;
+    }
+    window.optileListLoadCounter++;
+    console.log("Optile list load counter: " + window.optileListLoadCounter);
+    self.controller = new ValidationController(
+            jQuery('#payment_form_optile'),
+            forms,
+            jQuery('#payment-buttons-container > button'),
+            'input[name="optile-selected-network"]:checked'
+            );
+    self.controller.Init();
+
+    // OptileForm handles optile payment network radios and show/hide of the forms
+    window.optileForm = new OptileForm('co-payment-form');
+    window.optileForm.init();
+
+    jQuery('#payment_form_optile .verificationCode').parent().append('<span class="after">?</span>')
+
+    jQuery('#payment_form_optile .row3 .col2 .after').hover(
+            function() {
+              jQuery('#payment_form_optile .hint').show();
+            }, function() {
+      jQuery('#payment_form_optile .hint').hide();
+    }
+    );
+
+    if (window.optileListLoadCounter === 1) {
+      jQuery('#p_method_optile').click(); // optile method has to be preselected
+    }
+    jQuery('#p_method_optile').hide();
+    jQuery('label[for=p_method_optile]').hide();
+
+    // this is saved in the CHARGE on RETRY/TRY_OTHER_ACCOUNT handler
+    if (window.savedOptileData) {
+      console.log("filling in saved Optile data");
+      var form = self.controller.FindFormByFormId(window.savedOptileNetworkCode);
+      form.BindValues(window.savedOptileData);
+      window.optileForm.switchMethod(window.savedOptileNetworkCode);
+      jQuery('#optile-selected-network-' + form.networkCode).click();
+
+      delete window.savedOptileNetworkCode;
+      delete window.savedOptileData;
+    } else {
+      console.log("No saved Optile Data found.");
+    }
+
+    // OneStep checkout and design specific:
+    if (window.optileListLoadCounter > 1) {
+      jQuery('.checkout-onepage-index #p_method_optile').parent().hide();
+    }
+  });
+
 //]]>
 </script>
+
+<div id="payment_form_optile">
+  <input type="hidden" name="optile-list-self" id="optile-list-self" value="<?php
+  $links = $response->getLinks();
+  echo $links['self'];
+  ?>">
+         <?php $first = true ?>
+  <ul>
+    <?php if (count($networkGroups) == 0): ?>
+      <li><div class="optile-error-msg"><?php echo $response->getInfo() ?></div></li>
+    <?php endif ?>
+
+    <?php foreach ($networkGroups as $networkGroupCode => $networks): ?>
+      <div id="optile-group-<?php echo $networkGroupCode ?>">
+        <?php foreach ($networks as $network): ?>
+          <li>
+            <input type="hidden" id="optile_<?php echo $network->getCode() ?>-operation" name="operation" value="<?php echo $network->getLinks()->getOperation() ?>">
+      <input type="radio" name="optile-selected-network" id="optile-selected-network-<?php echo $network->getCode() ?>" onclick="optileForm.switchMethod('optile_<?php echo $network->getCode() ?>')" value="optile_<?php echo $network->getCode() ?>" <?php if($first): echo "checked"; $first = false; endif ?>>
+            <label for="optile-selected-network-<?php echo $network->getCode() ?>"><img src="<?php echo $network->getLinks()->getLogoLink() ?>" /></label>
+            <div><?php echo Mage::helper('optile')->getPaymentInstructions($network->getCode(), Mage::app()->getStore()->getId()); ?></div>
+            <div id="optile_<?php echo $network->getCode() ?>-network" style="display:none;">
+              <?php echo $this->renderFormHtml($network->getLinks()->getLocalizedFormHtml(), $this->getFormId($network->getCode())) ?>
+            </div>
+          </li>
+        <?php endforeach ?>
+      </div>
+    <?php endforeach ?>
+  </ul>
+</div>
