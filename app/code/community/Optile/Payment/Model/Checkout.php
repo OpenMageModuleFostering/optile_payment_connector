@@ -67,6 +67,13 @@ class Optile_Payment_Model_Checkout {
 	}
 
 	/**
+	 * Returns merchant_division setting
+	 */
+	protected function getMerchantDivision() {
+		return Mage::getStoreConfig('payment/optile/merchant_division');
+	}
+
+	/**
 	 * Returns merchant_token setting
 	 */
 	protected function getMerchantToken() {
@@ -180,6 +187,9 @@ class Optile_Payment_Model_Checkout {
             ->setCountry($this->getCountry())
         ;
 
+        if($this->getMerchantDivision()){
+            $request->setDivision($this->getMerchantDivision());
+        }
 
         $reference = Mage::helper('checkout')->__('Quote #%s, %s order', Mage::helper('optile')->formatQuoteId($quote->getId()), $this->getStoreName());
 

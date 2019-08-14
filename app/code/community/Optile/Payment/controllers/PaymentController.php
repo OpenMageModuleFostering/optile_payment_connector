@@ -61,6 +61,25 @@ class Optile_Payment_PaymentController extends Mage_Core_Controller_Front_Action
         $this->_redirect('checkout/cart');
     }
 
+    public function ilogAction(){
+        $params = Mage::app()->getRequest()->getPost();
+        $message = isset($params['message']) ? $params['message'] : null;
+        $data = isset($params['data']) ? $params['data'] : null;
+
+        if($message == null){
+            die(); // nothing to log, obscuring log API.
+        }
+
+        Mage::helper('optile')->log($message, Zend_Log::ALERT);
+        Mage::helper('optile')->log($data,  Zend_log::ALERT);
+
+
+        // Send out alert emails, if so configured in Admin
+        Mage::helper('optile/notification')->processMessage($message, $data);
+
+        die();
+    }
+
     /**
      * Return checkout session object
      *

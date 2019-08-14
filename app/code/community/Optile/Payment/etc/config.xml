@@ -81,6 +81,11 @@
                     <file>optile/order_cancel_guest.html</file>
                     <type>html</type>
                 </sales_email_order_cancel_guest_template>
+                <sales_email_transaction_failed_notification_template translate="label" module="sales">
+                    <label>Transaction failed Notification</label>
+                    <file>optile/transaction_failed_notification.html</file>
+                    <type>html</type>
+                </sales_email_transaction_failed_notification_template>
             </email>
         </template>
         <events>

@@ -149,7 +149,7 @@ abstract class Request extends Component {
         Logger::log(__METHOD__.': Request: '.$message);
 
         if(isset($this->merchantCode, $this->merchantToken)) {
-            $curlOpts[CURLOPT_USERPWD] = $this->merchantCode.'/'.$this->merchantToken;
+            $curlOpts[CURLOPT_USERPWD] = $this->merchantCode.':'.$this->merchantToken;
         }
 
         $ch = curl_init($url);
@@ -160,7 +160,7 @@ abstract class Request extends Component {
         $response_error = curl_error($ch);
 
         Logger::log(__METHOD__.': Response: '.$response. ', Response error: ' . $response_error);
-        Logger::log(__METHOD__.': Auth: '. $curlOpts[CURLOPT_USERPWD] = $this->merchantCode.'/'.$this->merchantToken);
+        Logger::log(__METHOD__.': Auth: '. $curlOpts[CURLOPT_USERPWD] = $this->merchantCode.':'.$this->merchantToken);
 
 
         curl_close($ch);

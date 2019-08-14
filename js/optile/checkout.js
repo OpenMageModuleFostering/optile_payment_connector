@@ -25,6 +25,24 @@ jQuery(function() {
     return false;
   }
 
+  iLogger = {
+    error: function(message, data){
+      console.log(data);
+      console.log(status);
+
+      jQuery.ajax({
+        type: 'POST',
+        url: '/optile/payment/ilog',
+        dataType: 'json',
+        data: {
+          message: message,
+          data: data,
+        }
+      })
+    }
+
+  }
+
   ValidationController.prototype.Validate = function(event) {
     var self = this;
     var network = this.widget.find("input[name=\"optile-selected-network\"]:checked").val();
@@ -67,6 +85,16 @@ jQuery(function() {
           );
         }
         ;
+      },
+      error: function(resultData, resultStatus, xhr){
+        iLogger.error(
+            "Error while sending VALIDATE request",
+            {
+              url: url,
+              responseText: resultData.responseText,
+              status: resultData.status
+            }
+        );
       }
 
     });
@@ -216,7 +244,9 @@ jQuery(function() {
           });
         }
 
-        params = jQuery.param(data);
+        data = { 'account': data };
+        params = JSON.stringify(data);
+
 
         var operationUrl = jQuery('#' + network + '-operation').val();
         var listRequestSelfLink = jQuery('#optile-list-self').val();
@@ -227,7 +257,7 @@ jQuery(function() {
         jQuery.ajax({
           type: 'POST',
           url: operationUrl,
-          data: JSON.stringify(data),
+          data: params,
           dataType: 'json',
           async: false,
           success: function(resultData, resultStatus, xhr) {
@@ -251,6 +281,13 @@ jQuery(function() {
                 break;
               default:
                 console.log("ERROR! Can't find interaction code handler");
+                iLogger.error(
+                    "Can't find interaction code handler",
+                    {
+                      url: operationUrl,
+                      resultData: resultData,
+                    }
+                );
                 break;
             }
             if (handler) {
@@ -260,6 +297,16 @@ jQuery(function() {
             if (paymentResponse.interaction.code != OptileInteractionCode.PROCEED) {
               self.optile_error = 1;
             }
+          },
+          error: function(resultData, resultStatus, xhr){
+            iLogger.error(
+                "Error while sending CHARGE request",
+                {
+                  url: operationUrl,
+                  responseText: resultData.responseText,
+                  status: resultData.status
+                }
+            );
           }
         });
 
@@ -419,6 +466,14 @@ jQuery(function() {
       // save data before reloading payment section
       saveOptileData();
 
+      iLogger.error(
+          "Received RETRY response code",
+          {
+            url: this.listRequestSelfLink,
+            paymentResponse: this.paymentResponse,
+          }
+      );
+
       // simulate shipping method save so it reloads payment section
       checkout.setLoadWaiting(false);
       shippingMethod.save(this.listRequestSelfLink);
@@ -436,6 +491,14 @@ jQuery(function() {
       // save data before reloading payment section
       saveOptileData();
 
+      iLogger.error(
+          "Received TRY_OTHER_ACCOUNT response code",
+          {
+            url: this.listRequestSelfLink,
+            paymentResponse: this.paymentResponse,
+          }
+      );
+
       // simulate shipping method save so it reloads payment section
       checkout.setLoadWaiting(false);
       shippingMethod.save(this.listRequestSelfLink);
@@ -450,6 +513,14 @@ jQuery(function() {
 
       OptileErrorHandler.error(this.paymentResponse.resultInfo);
 
+      iLogger.error(
+          "Received TRY_OTHER_NETWORK response code",
+          {
+            url: this.listRequestSelfLink,
+            paymentResponse: this.paymentResponse,
+          }
+      );
+
       // simulate shipping method save so it reloads payment section
       checkout.setLoadWaiting(false);
       shippingMethod.save(this.listRequestSelfLink);
@@ -458,6 +529,15 @@ jQuery(function() {
 
   var OptileInteractionCodeHandlerABORT = Class.create(OptileInteractionCodeHandler, {
     handle: function(context) {
+
+      iLogger.error(
+          "Received ABORT response code",
+          {
+            url: this.listRequestSelfLink,
+            paymentResponse: this.paymentResponse,
+          }
+      );
+
       checkout.setLoadWaiting(false);
 
       OptileErrorHandler.error(this.paymentResponse.resultInfo);
