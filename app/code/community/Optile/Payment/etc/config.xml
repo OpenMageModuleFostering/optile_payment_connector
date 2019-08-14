@@ -1,0 +1,81 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * This file is part of the Optile Payment Connector extension.
+ *
+ * Optile Payment Connector is free software: you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as published
+ * by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Optile Payment Connector is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * Optile Payment Connector.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @author      i-Ways <dev@i-ways.hr>
+ * @copyright   Copyright (c) 2013 Optile. (http://www.optile.de)
+ * @license     http://www.gnu.org/licenses/gpl.txt
+ */
+-->
+<config>
+	<modules>
+		<Optile_Payment>
+			<version>1.0.0</version>
+		</Optile_Payment>
+	</modules>
+
+	<global>
+		<models>
+			<optile>
+				<class>Optile_Payment_Model</class>
+			</optile>
+		</models>
+		<blocks>
+			<optile>
+				<class>Optile_Payment_Block</class>
+			</optile>
+		</blocks>
+		<helpers>
+			<optile>
+				<class>Optile_Payment_Helper</class>
+			</optile>
+		</helpers>
+	</global>
+
+	<frontend>
+		<routers>
+			<optile>
+				<use>standard</use>
+				<args>
+					<module>Optile_Payment</module>
+					<frontName>optile</frontName>
+				</args>
+			</optile>
+		</routers>
+        <layout>
+            <updates>
+                <optile>
+                    <file>optile/payment.xml</file>
+                </optile>
+            </updates>
+        </layout>
+	</frontend>
+
+	<default>
+		<payment>
+			<optile>
+				<model>optile/paymentMethod</model>
+				<payment_action>authorize</payment_action>				
+				<active>0</active>
+				<merchant_token backend_model="adminhtml/system_config_backend_encrypted" />
+				<title>Optile</title>
+				<test>1</test>
+				<log_enabled>0</log_enabled>
+			</optile>
+		</payment>
+	</default>
+</config>

@@ -1,0 +1,82 @@
+<?php
+/**
+ * This file is part of the Optile Payment Connector extension.
+ *
+ * Optile Payment Connector is free software: you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as published
+ * by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Optile Payment Connector is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * Optile Payment Connector.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @author      i-Ways <dev@i-ways.hr>
+ * @copyright   Copyright (c) 2013 Optile. (http://www.optile.de)
+ * @license     http://www.gnu.org/licenses/gpl.txt
+ */
+
+/* @var $this Optile_Payment_Block_List */
+?>
+<?php $response = $this->getListResponse() ?>
+<?php $networkGroups = $response->getNetworks() ?>
+<script type="text/javascript">
+//<![CDATA[
+    var self = this;
+    var controller;
+
+    jQuery(function() {
+		var forms = Array();
+		<?php foreach($networkGroups as $networkGroupCode => $networks): ?>
+			<?php foreach($networks as $network): ?>
+		forms.push(new ValidationForm('<?php echo $this->getFormId($network->getCode()) ?>', '<?php echo $network->getLinks()->getValidationLink() ?>'));
+			<?php endforeach ?>
+		<?php endforeach ?>
+		
+		self.controller = new ValidationController(
+				jQuery('#payment_form_optile'), 
+				forms, 
+ 				jQuery('#payment-buttons-container > button')
+				);
+		self.controller.Init();
+	});
+
+//]]>
+</script>
+<style>
+.optile-error-msg { color: red; }
+</style>
+
+<div id="payment_form_optile" style="display:none;">
+<input type="hidden" name="optile-list-self" id="optile-list-self" value="<?php $links = $response->getLinks(); echo $links['self']; ?>">
+<?php $first = true ?>
+<ul style="padding-left: 20px">
+<?php foreach($networkGroups as $networkGroupCode => $networks): ?>
+<div id="optile-group-<?php echo $networkGroupCode ?>">
+	<?php foreach($networks as $network): ?>
+	<li>
+	<input type="hidden" id="optile-<?php echo $network->getCode() ?>-operation" name="operation" value="<?php echo $network->getLinks()->getOperation() ?>">
+	<input type="radio" name="optile-selected-network" onclick="optileForm.switchMethod('optile-<?php echo $network->getCode() ?>')" value="optile-<?php echo $network->getCode() ?>" <?php if($first): echo "checked"; $first = false; endif ?>>
+	<img src="<?php echo $network->getLinks()->getLogoLink() ?>" />	
+	<div id="optile-<?php echo $network->getCode() ?>-network" style="display:none;">
+		<?php echo $this->renderFormHtml($network->getLinks()->getLocalizedFormHtml(), $this->getFormId($network->getCode())) ?>
+	</div>
+	</li>
+	<?php endforeach ?>
+</div>
+<?php endforeach ?>
+</ul>
+</div>
+
+<script type="text/javascript">
+//<![CDATA[
+           jQuery(function() {
+			window.optileForm = new OptileForm('co-payment-form');    
+			optileForm.init();
+           });
+//]]>
+</script>

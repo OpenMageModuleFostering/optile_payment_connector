@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<layout version="0.1.0">
+    <checkout_onepage_index>
+        <reference name="head">
+            <action method="addJs"><script>optile/jquery.2.0.3.min.js</script></action>
+            <action method="addJs"><script>optile/jquery.noconflict.js</script></action>
+            <action method="addJs"><script>optile/optilevalidation.js</script></action>
+            <action method="addJs"><script>optile/checkout.js</script></action>
+        </reference>
+    </checkout_onepage_index>
+</layout>
