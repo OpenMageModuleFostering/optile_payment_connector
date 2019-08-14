@@ -104,6 +104,15 @@
     </global>
 
     <frontend>
+        <translate>
+            <modules>
+                <translations>
+                    <files>
+                        <default>Iways_Optile.csv</default>
+                    </files>
+                </translations>
+            </modules>
+        </translate>
         <routers>
             <optile>
                 <use>standard</use>
@@ -133,6 +142,15 @@
     </frontend>
 
     <adminhtml>
+        <translate>
+            <modules>
+                <translations>
+                    <files>
+                        <default>Iways_Optile.csv</default>
+                    </files>
+                </translations>
+            </modules>
+        </translate>
         <events>
             <admin_system_config_section_save_after>
                 <observers>
