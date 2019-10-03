@@ -1,5 +1,5 @@
 {
-    "name": "OpenMageModuleFostering\/Optile_Payment_Connector",
+    "name": "openmage-module-fostering\/optile_payment_connector",
     "type": "magento-module",
     "license": "GNU-General-Public-License",
     "homepage": "",
